@@ -68,7 +68,6 @@ public class Main extends PApplet {
 	}
 
 	public void mousePressed() {
-		redraw();
 		if (!translate) {
 			TableRow newRow = table.addRow();
 			newRow.setInt("x", mouseX);
@@ -90,6 +89,7 @@ public class Main extends PApplet {
 				translateY = mouseY;
 			}
 		}
+		redraw();
 	}
 
 	public void keyPressed() {
