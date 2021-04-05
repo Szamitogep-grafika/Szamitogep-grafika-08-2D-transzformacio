@@ -1,18 +1,18 @@
 import processing.core.PApplet;
 import processing.data.Table;
 import processing.data.TableRow;
+import processing.event.MouseEvent;
 
 public class Main extends PApplet {
-	final boolean DEBUG = true;
+	final boolean DEBUG = false;
 	Table table;
 	boolean translate = false;
 	boolean rotate = false;
 	int rotateAngle = 20;
 	boolean scale = false;
-	int translateX = 0;
-	int translateY = 0;
-	int countTranslateClicks = 0;
-	final boolean translationCutsModel = true;
+	float transformX, transformY;
+	int countClicks = 0;
+	final boolean translationCutsModel = false;
 
 	final int BENT = 0;    // 0000
 	final int BAL = 1;    // 0001
@@ -36,8 +36,9 @@ public class Main extends PApplet {
 			this.y2 = y2;
 		}
 	}
+
 	static class Point {
-		float x,y;
+		float x, y;
 
 		public Point(float x, float y) {
 			this.x = x;
@@ -49,8 +50,13 @@ public class Main extends PApplet {
 	public void setup() {
 		size(640, 480);
 
-		xMin = padding;
-		yMin = padding;
+		if (DEBUG) {
+			xMin = padding;
+			yMin = padding;
+		} else {
+			xMin = 0;
+			yMin = 0;
+		}
 		xMax = width - xMin;
 		yMax = height - yMin;
 
@@ -66,6 +72,7 @@ public class Main extends PApplet {
 			rect(xMin, yMin, width - 2 * xMin, height - 2 * yMin);
 
 		drawLines(table);
+		noLoop();
 	}
 
 	int Zona(double x, double y) {
@@ -135,7 +142,7 @@ public class Main extends PApplet {
 
 
 		if (elfogad) {
-			drawLine(x0, y0, x1, y1);
+			//drawLine(x0, y0, x1, y1);
 			return new Line(x0, y0, x1, y1);
 		}
 		return null;
@@ -144,6 +151,8 @@ public class Main extends PApplet {
 	void drawLine(float x1, float y1, float x2, float y2) {
 		float m;
 		float i, j;
+
+		println("Szakasz: (" + x1 + "," + y1 + "), (" + x2  + "," +  y2 + ")");
 
 		if (x2 != x1) { // nem függőleges
 			m = (y2 - y1) / (x2 - x1);
@@ -183,10 +192,10 @@ public class Main extends PApplet {
 			Line line = CohenSutherlandSzakaszvago(x1, y1, x2, y2);
 			if (translationCutsModel) {
 				if (line != null) {
-					x1 = (int) line.x1;
-					y1 = (int) line.y1;
-					x2 = (int) line.x2;
-					y2 = (int) line.y2;
+					x1 = line.x1;
+					y1 = line.y1;
+					x2 = line.x2;
+					y2 = line.y2;
 
 					table.getRow(i).setFloat("x", x2);
 					table.getRow(i).setFloat("y", y2);
@@ -204,20 +213,20 @@ public class Main extends PApplet {
 	}
 
 	void translate() {
-		countTranslateClicks++;
+		countClicks++;
 
-		if (countTranslateClicks % 2 == 0) {
-			translateX = mouseX - translateX;
-			translateY = mouseY - translateY;
-			countTranslateClicks = 0;
+		if (countClicks % 2 == 0) {
+			transformX = mouseX - transformX;
+			transformY = mouseY - transformY;
+			countClicks = 0;
 
 			for (TableRow row : table.rows()) {
-				row.setFloat("x", row.getFloat("x") + translateX);
-				row.setFloat("y", row.getFloat("y") + translateY);
+				row.setFloat("x", row.getFloat("x") + transformX);
+				row.setFloat("y", row.getFloat("y") + transformY);
 			}
 		} else {
-			translateX = mouseX;
-			translateY = mouseY;
+			transformX = mouseX;
+			transformY = mouseY;
 		}
 	}
 
@@ -251,8 +260,37 @@ public class Main extends PApplet {
 
 			table.getRow(i).setFloat("x", point1.x);
 			table.getRow(i).setFloat("y", point1.y);
-			table.getRow(i+1).setFloat("x", point2.x);
-			table.getRow(i+1).setFloat("y", point2.y);
+			table.getRow(i + 1).setFloat("x", point2.x);
+			table.getRow(i + 1).setFloat("y", point2.y);
+		}
+	}
+
+	void scale() {
+		countClicks++;
+
+		if (countClicks % 2 == 0) {
+			transformX = mouseX - transformX;
+			transformY = mouseY - transformY;
+			countClicks = 0;
+
+			for (TableRow row : table.rows()) {
+				float x = row.getFloat("x");
+				float y = row.getFloat("y");
+				x *= transformX;
+				y *= transformY;
+
+				row.setFloat("x", row.getFloat("x") * transformX);
+				row.setFloat("y", row.getFloat("y") * transformY);
+			}
+		} else {
+			transformX = mouseX;
+			transformY = mouseY;
+		}
+	}
+	public void scale(float scale) {
+		for (TableRow row : table.rows()) {
+			row.setFloat("x", mouseX + (row.getFloat("x") - mouseX) * scale);
+			row.setFloat("y", mouseY + (row.getFloat("y") - mouseY) * scale);
 		}
 	}
 
@@ -263,6 +301,9 @@ public class Main extends PApplet {
 			}
 			if (rotate) {
 				rotate();
+			}
+			if (scale) {
+				scale();
 			}
 		} else {
 			TableRow newRow = table.addRow();
@@ -294,6 +335,15 @@ public class Main extends PApplet {
 					break;
 				}
 			}
+	}
+
+	public void mouseWheel(MouseEvent event) {
+		float e = event.getCount();
+		if (e<0)
+			scale((float) 1.1);
+		else
+			scale((float) (1.0/1.1));
+		redraw();
 	}
 
 	public void settings() {
