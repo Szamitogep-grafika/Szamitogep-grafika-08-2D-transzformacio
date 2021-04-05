@@ -43,7 +43,7 @@ public class Main extends PApplet {
 				i = (y < y0) ? x : x0;
 				for (j = Math.min(y, y0); j < (Math.max(y, y0)); j++) {
 					point(i, j);
-					i += 1/m;
+					i += 1 / m;
 				}
 			}
 		} else {    // függőleges
@@ -56,12 +56,12 @@ public class Main extends PApplet {
 	void drawLines(Table table) {
 		int x1, y1, x2, y2, i;
 
-		for (i = 0; i < table.getRowCount()-1; i+=2) {
+		for (i = 0; i < table.getRowCount() - 1; i += 2) {
 			x2 = table.getRow(i).getInt("x");
 			y2 = table.getRow(i).getInt("y");
 
-			x1 = table.getRow(i+1).getInt("x");
-			y1 = table.getRow(i+1).getInt("y");
+			x1 = table.getRow(i + 1).getInt("x");
+			y1 = table.getRow(i + 1).getInt("y");
 
 			drawLine(x1, y1, x2, y2);
 		}
@@ -82,8 +82,8 @@ public class Main extends PApplet {
 				countTranslateClicks = 0;
 
 				for (TableRow row : table.rows()) {
-					row.setInt("x",row.getInt("x") + translateX);
-					row.setInt("y",row.getInt("y") + translateY);
+					row.setInt("x", row.getInt("x") + translateX);
+					row.setInt("y", row.getInt("y") + translateY);
 				}
 			} else {
 				translateX = mouseX;
