@@ -203,58 +203,66 @@ public class Main extends PApplet {
 		}
 	}
 
+	void translate() {
+		countTranslateClicks++;
+
+		if (countTranslateClicks % 2 == 0) {
+			translateX = mouseX - translateX;
+			translateY = mouseY - translateY;
+			countTranslateClicks = 0;
+
+			for (TableRow row : table.rows()) {
+				row.setFloat("x", row.getFloat("x") + translateX);
+				row.setFloat("y", row.getFloat("y") + translateY);
+			}
+		} else {
+			translateX = mouseX;
+			translateY = mouseY;
+		}
+	}
+
+	void rotate() {
+		for (int i = 0; i < table.getRowCount() - 1; i += 2) {
+			float x1 = table.getRow(i).getFloat("x");
+			float y1 = table.getRow(i).getFloat("y");
+			float x2 = table.getRow(i + 1).getFloat("x");
+			float y2 = table.getRow(i + 1).getFloat("y");
+
+			Point point1 = new Point(x1, y1);
+			Point point2 = new Point(x2, y2);
+
+			x1 -= mouseX;
+			y1 -= mouseY;
+
+			x2 -= mouseX;
+			y2 -= mouseY;
+
+			point1.x = x1 * cos(radians(rotateAngle)) - y1 * sin(radians(rotateAngle));
+			point1.y = x1 * sin(radians(rotateAngle)) + y1 * cos(radians(rotateAngle));
+
+			point2.x = x2 * cos(radians(rotateAngle)) - y2 * sin(radians(rotateAngle));
+			point2.y = x2 * sin(radians(rotateAngle)) + y2 * cos(radians(rotateAngle));
+
+			point1.x += mouseX;
+			point1.y += mouseY;
+
+			point2.x += mouseX;
+			point2.y += mouseY;
+
+			table.getRow(i).setFloat("x", point1.x);
+			table.getRow(i).setFloat("y", point1.y);
+			table.getRow(i+1).setFloat("x", point2.x);
+			table.getRow(i+1).setFloat("y", point2.y);
+		}
+	}
+
 	public void mousePressed() {
 		if (translate || rotate || scale) {
 			if (translate) {
-				countTranslateClicks++;
-
-				if (countTranslateClicks % 2 == 0) {
-					translateX = mouseX - translateX;
-					translateY = mouseY - translateY;
-					countTranslateClicks = 0;
-
-					for (TableRow row : table.rows()) {
-						row.setFloat("x", row.getFloat("x") + translateX);
-						row.setFloat("y", row.getFloat("y") + translateY);
-					}
-				} else {
-					translateX = mouseX;
-					translateY = mouseY;
-				}
+				translate();
 			}
 			if (rotate) {
-				for (int i = 0; i < table.getRowCount() - 1; i += 2) {
-					float x1 = table.getRow(i).getFloat("x");
-					float y1 = table.getRow(i).getFloat("y");
-					float x2 = table.getRow(i + 1).getFloat("x");
-					float y2 = table.getRow(i + 1).getFloat("y");
-
-					Point point1 = new Point(x1, y1);
-					Point point2 = new Point(x2, y2);
-
-					x1 -= mouseX;
-					y1 -= mouseY;
-
-					x2 -= mouseX;
-					y2 -= mouseY;
-
-					point1.x = x1 * cos(radians(rotateAngle)) - y1 * sin(radians(rotateAngle));
-					point1.y = x1 * sin(radians(rotateAngle)) + y1 * cos(radians(rotateAngle));
-
-					point2.x = x2 * cos(radians(rotateAngle)) - y2 * sin(radians(rotateAngle));
-					point2.y = x2 * sin(radians(rotateAngle)) + y2 * cos(radians(rotateAngle));
-
-					point1.x += mouseX;
-					point1.y += mouseY;
-
-					point2.x += mouseX;
-					point2.y += mouseY;
-
-					table.getRow(i).setFloat("x", point1.x);
-					table.getRow(i).setFloat("y", point1.y);
-					table.getRow(i+1).setFloat("x", point2.x);
-					table.getRow(i+1).setFloat("y", point2.y);
-				}
+				rotate();
 			}
 		} else {
 			TableRow newRow = table.addRow();
