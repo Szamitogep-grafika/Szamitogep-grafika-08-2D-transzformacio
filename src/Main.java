@@ -273,7 +273,7 @@ public class Main extends PApplet {
 					scale = false;
 					break;
 				}
-				case 'r': {
+				case 'f': {
 					rotate = !rotate;
 					translate = false;
 					scale = false;
