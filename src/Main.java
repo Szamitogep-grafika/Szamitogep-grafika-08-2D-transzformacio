@@ -169,14 +169,15 @@ public class Main extends PApplet {
 	}
 
 	void drawLines(Table table) {
-		int x1, y1, x2, y2, i;
+		int i;
+		float x1, y1, x2, y2;
 
 		for (i = 0; i < table.getRowCount() - 1; i += 2) {
-			x2 = table.getRow(i).getInt("x");
-			y2 = table.getRow(i).getInt("y");
+			x2 = table.getRow(i).getFloat("x");
+			y2 = table.getRow(i).getFloat("y");
 
-			x1 = table.getRow(i + 1).getInt("x");
-			y1 = table.getRow(i + 1).getInt("y");
+			x1 = table.getRow(i + 1).getFloat("x");
+			y1 = table.getRow(i + 1).getFloat("y");
 
 			//drawLine(x1, y1, x2, y2); // helyette CohenSutherlandSzakaszvago()
 			Line line = CohenSutherlandSzakaszvago(x1, y1, x2, y2);
@@ -187,10 +188,10 @@ public class Main extends PApplet {
 					x2 = (int) line.x2;
 					y2 = (int) line.y2;
 
-					table.getRow(i).setInt("x", x2);
-					table.getRow(i).setInt("y", y2);
-					table.getRow(i + 1).setInt("x", x1);
-					table.getRow(i + 1).setInt("y", y1);
+					table.getRow(i).setFloat("x", x2);
+					table.getRow(i).setFloat("y", y2);
+					table.getRow(i + 1).setFloat("x", x1);
+					table.getRow(i + 1).setFloat("y", y1);
 				} else {
 					table.removeRow(i + 1);
 					table.removeRow(i);
