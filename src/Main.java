@@ -5,6 +5,9 @@ import processing.data.TableRow;
 public class Main extends PApplet {
 	Table table;
 	boolean translate = false;
+	boolean rotate = false;
+	int rotateAngle = 20;
+	boolean scale = false;
 	int translateX = 0;
 	int translateY = 0;
 	int countTranslateClicks = 0;
@@ -90,12 +93,32 @@ public class Main extends PApplet {
 	}
 
 	public void keyPressed() {
-		if (key == 't') {
-			translate = !translate;
-		}
+		if (table.getRowCount() % 2 == 0)   // Megkezdett modell-elem esetén a transzformációk nem kapcsolhatók be
+			switch (key) {                  // A három funkció közül egyszerre csak az egyik működjön
+				case 't': {
+					translate = !translate;
+					rotate = false;
+					scale = false;
+					break;
+				}
+				case 'r': {
+					rotate = !rotate;
+					translate = false;
+					scale = false;
+					break;
+				}
+				case 's': {
+					scale = !scale;
+					translate = false;
+					rotate = false;
+					break;
+				}
+			}
 	}
 
-	public void settings() { setup(); }
+	public void settings() {
+		setup();
+	}
 
 	static public void main(String[] passedArgs) {
 		PApplet.main("Main");
