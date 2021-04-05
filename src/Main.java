@@ -26,29 +26,29 @@ public class Main extends PApplet {
 		drawLines(table);
 	}
 
-	void drawLine(float x, float y, float x0, float y0) {
+	void drawLine(float x1, float y1, float x2, float y2) {
 		float m;
 		float i, j;
 
-		if (x0 != x) { // nem függőleges
-			m = (y0 - y) / (x0 - x);
+		if (x2 != x1) { // nem függőleges
+			m = (y2 - y1) / (x2 - x1);
 
 			if (abs(m) <= 1) {
-				j = (x < x0) ? y : y0;
-				for (i = Math.min(x, x0); i < (Math.max(x, x0)); i++) {
+				j = (x1 < x2) ? y1 : y2;
+				for (i = Math.min(x1, x2); i < (Math.max(x1, x2)); i++) {
 					point(i, j);
 					j += m;
 				}
 			} else {
-				i = (y < y0) ? x : x0;
-				for (j = Math.min(y, y0); j < (Math.max(y, y0)); j++) {
+				i = (y1 < y2) ? x1 : x2;
+				for (j = Math.min(y1, y2); j < (Math.max(y1, y2)); j++) {
 					point(i, j);
 					i += 1 / m;
 				}
 			}
 		} else {    // függőleges
-			for (j = Math.min(y, y0); j < (Math.max(y, y0)); j++) {
-				point(x, j);
+			for (j = Math.min(y1, y2); j < (Math.max(y1, y2)); j++) {
+				point(x1, j);
 			}
 		}
 	}
