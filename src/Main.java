@@ -15,7 +15,7 @@ public class Main extends PApplet {
 	final boolean translationCutsModel = false;
 
 	final int BENT = 0;    // 0000
-	final int BAL = 1;    // 0001
+	final int BAL = 1;     // 0001
 	final int JOBB = 2;    // 0010
 	final int LENT = 4;    // 0100
 	final int FENT = 8;    // 1000
