@@ -26,8 +26,8 @@ public class Main extends PApplet {
 	float xMax;
 	float yMax;
 
-	final float [][] tInit = new float[][] {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-	final float [] pInit = new float[] {0,0,1};
+	final float[][] tInit = new float[][]{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+	final float[] pInit = new float[]{0, 0, 1};
 
 
 	static class Line {
@@ -214,11 +214,11 @@ public class Main extends PApplet {
 		}
 	}
 
-	float[] matrixMultiplication (float[][] t, float[] p) {
-		float[] transformed = new float[] {0,0,1};
+	float[] matrixMultiplication(float[][] t, float[] p) {
+		float[] transformed = new float[]{0, 0, 1};
 
-		for (int i=0; i<t.length; i++) {
-			for (int j=0; j<t.length; j++) {
+		for (int i = 0; i < t.length; i++) {
+			for (int j = 0; j < t.length; j++) {
 				transformed[i] += t[i][j] * p[j];
 			}
 		}
@@ -234,26 +234,47 @@ public class Main extends PApplet {
 			transformY = mouseY - transformY;
 			countClicks = 0;
 
-			float[][] T = tInit;
-			T[0][2] = transformX;
-			T[1][2] = transformY;
-
-			for (TableRow row : table.rows()) {
-				float[] p = pInit;
-				p[0] = row.getFloat("x");
-				p[1] = row.getFloat("y");
-				p = matrixMultiplication(T, p);
-
-				row.setFloat("x", p[0]);
-				row.setFloat("y", p[1]);
-			}
+			translate(transformX, transformY);
 		} else {
 			transformX = mouseX;
 			transformY = mouseY;
 		}
 	}
 
+	public void translate(float transformX, float transformY) {
+		float[][] T = tInit;
+		T[0][2] = transformX;
+		T[1][2] = transformY;
+
+		for (TableRow row : table.rows()) {
+			float[] p = pInit;
+			p[0] = row.getFloat("x");
+			p[1] = row.getFloat("y");
+			p = matrixMultiplication(T, p);
+
+			row.setFloat("x", p[0]);
+			row.setFloat("y", p[1]);
+		}
+	}
+
 	void rotate() {
+		float[][] T = tInit;
+		T[0][0] = cos(radians(rotateAngle));
+		T[0][1] = -sin(radians(rotateAngle));
+		T[1][0] = sin(radians(rotateAngle));
+		T[1][1] = cos(radians(rotateAngle));
+
+		for (TableRow row : table.rows()) {
+			float[] p = pInit;
+			p[0] = row.getFloat("x");
+			p[1] = row.getFloat("y");
+			p = matrixMultiplication(T, p);
+
+			row.setFloat("x", p[0]);
+			row.setFloat("y", p[1]);
+		}
+
+		/*
 		for (int i = 0; i < table.getRowCount() - 1; i += 2) {
 			float x1 = table.getRow(i).getFloat("x");
 			float y1 = table.getRow(i).getFloat("y");
@@ -286,6 +307,7 @@ public class Main extends PApplet {
 			table.getRow(i + 1).setFloat("x", point2.x);
 			table.getRow(i + 1).setFloat("y", point2.y);
 		}
+		 */
 	}
 
 	void scale() {
@@ -386,10 +408,10 @@ public class Main extends PApplet {
 
 	public void mouseWheel(MouseEvent event) {
 		float e = event.getCount();
-		if (e<0)
+		if (e < 0)
 			scale((float) 1.1);
 		else
-			scale((float) (1.0/1.1));
+			scale((float) (1.0 / 1.1));
 		redraw();
 	}
 
