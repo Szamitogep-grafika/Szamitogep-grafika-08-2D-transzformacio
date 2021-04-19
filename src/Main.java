@@ -218,9 +218,11 @@ public class Main extends PApplet {
 		float[] transformed = new float[]{0, 0, 1};
 
 		for (int i = 0; i < t.length; i++) {
+			float sum = 0;
 			for (int j = 0; j < t.length; j++) {
-				transformed[i] += t[i][j] * p[j];
+				sum += t[i][j] * p[j];
 			}
+			transformed[i] = sum;
 		}
 
 		return transformed;
