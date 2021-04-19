@@ -8,14 +8,14 @@ public class Main extends PApplet {
 	Table table;
 	boolean translate = false;
 	boolean rotate = false;
-	int rotateAngle = 20;
+	int rotateAngle = 45;
 	boolean scale = false;
 	float transformX, transformY;
 	int countClicks = 0;
 	final boolean translationCutsModel = false;
 
 	final int BENT = 0;    // 0000
-	final int BAL  = 1;    // 0001
+	final int BAL = 1;    // 0001
 	final int JOBB = 2;    // 0010
 	final int LENT = 4;    // 0100
 	final int FENT = 8;    // 1000
@@ -72,9 +72,7 @@ public class Main extends PApplet {
 	public void draw() {
 		background(204);
 
-		if (DEBUG)
-			rect(xMin, yMin, width - 2 * xMin, height - 2 * yMin);
-
+		checkOverflow();
 		drawLines(table);
 		noLoop();
 	}
