@@ -310,11 +310,35 @@ public class Main extends PApplet {
 			transformY = mouseY;
 		}
 	}
+
 	public void scale(float scale) {
 		for (TableRow row : table.rows()) {
 			row.setFloat("x", mouseX + (row.getFloat("x") - mouseX) * scale);
 			row.setFloat("y", mouseY + (row.getFloat("y") - mouseY) * scale);
 		}
+	}
+
+	public void checkOverflow() {
+		float minX = 1, minY = 1, maxX = width, maxY = height;
+
+		for (TableRow row : table.rows()) {
+			float x, y;
+
+			x = row.getFloat("x");
+			y = row.getFloat("y");
+
+			if (x < minX) minX = x;
+			if (y < minY) minY = y;
+			if (x > maxX) maxX = x;
+			if (y > maxY) maxY = y;
+		}
+
+		if (minX < 1) translate(-minX, 0);
+		if (maxX > width) translate(width - maxX, 0);
+
+		if (minY < 1) translate(0, -minY);
+		if (maxY > height) translate(0, height - maxY);
+
 	}
 
 	public void mousePressed() {
