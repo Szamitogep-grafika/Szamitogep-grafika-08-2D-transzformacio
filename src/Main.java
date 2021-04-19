@@ -26,6 +26,10 @@ public class Main extends PApplet {
 	float xMax;
 	float yMax;
 
+	final float [][] tInit = new float[][] {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+	final float [] pInit = new float[] {0,0,1};
+
+
 	static class Line {
 		float x1, y1, x2, y2;
 
@@ -186,7 +190,8 @@ public class Main extends PApplet {
 			x1 = table.getRow(i + 1).getFloat("x");
 			y1 = table.getRow(i + 1).getFloat("y");
 
-			//drawLine(x1, y1, x2, y2); // helyette CohenSutherlandSzakaszvago()
+			drawLine(x1, y1, x2, y2); // helyette CohenSutherlandSzakaszvago()
+			/*
 			Line line = CohenSutherlandSzakaszvago(x1, y1, x2, y2);
 			if (translationCutsModel) {
 				if (line != null) {
@@ -207,7 +212,20 @@ public class Main extends PApplet {
 
 			if (line != null)
 				drawLine(line.x1, line.y1, line.x2, line.y2);
+			 */
 		}
+	}
+
+	float[] matrixMultiplication (float[][] t, float[] p) {
+		float[] transformed = new float[] {0,0,1};
+
+		for (int i=0; i<t.length; i++) {
+			for (int j=0; j<t.length; j++) {
+				transformed[i] += t[i][j] * p[j];
+			}
+		}
+
+		return transformed;
 	}
 
 	void translate() {
@@ -218,9 +236,18 @@ public class Main extends PApplet {
 			transformY = mouseY - transformY;
 			countClicks = 0;
 
+			float[][] T = tInit;
+			T[0][2] = transformX;
+			T[1][2] = transformY;
+
 			for (TableRow row : table.rows()) {
-				row.setFloat("x", row.getFloat("x") + transformX);
-				row.setFloat("y", row.getFloat("y") + transformY);
+				float[] p = pInit;
+				p[0] = row.getFloat("x");
+				p[1] = row.getFloat("y");
+				p = matrixMultiplication(T, p);
+
+				row.setFloat("x", p[0]);
+				row.setFloat("y", p[1]);
 			}
 		} else {
 			transformX = mouseX;
