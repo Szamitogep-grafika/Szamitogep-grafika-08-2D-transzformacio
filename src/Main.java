@@ -27,28 +27,6 @@ public class Main extends PApplet {
 		}
 	}
 
-
-	static class Line {
-		float x1, y1, x2, y2;
-
-		public Line(float x1, float y1, float x2, float y2) {
-			this.x1 = x1;
-			this.y1 = y1;
-			this.x2 = x2;
-			this.y2 = y2;
-		}
-	}
-
-	static class Point {
-		float x, y;
-
-		public Point(float x, float y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
-
-
 	public void setup() {
 		size(width, height);
 
@@ -129,6 +107,21 @@ public class Main extends PApplet {
 		return transformed;
 	}
 
+	void transform(float[][] T, float originX, float originY, boolean checkOverflow) {
+		for (TableRow row : table.rows()) {
+			float[] p = {0, 0, 1};
+			p[0] = row.getFloat("x") - originX;
+			p[1] = row.getFloat("y") - originY;
+
+			p = matrixMultiplication(T, p);
+
+			row.setFloat("x", p[0] + originX);
+			row.setFloat("y", p[1] + originY);
+		}
+
+		if (checkOverflow) checkOverflow("translate");
+	}
+
 	void translate(boolean checkOverflow) {
 		countClicks++;
 
@@ -149,18 +142,7 @@ public class Main extends PApplet {
 		T[0][2] = transformX;
 		T[1][2] = transformY;
 
-		for (TableRow row : table.rows()) {
-			float[] p = pInit;
-			p[0] = row.getFloat("x");
-			p[1] = row.getFloat("y");
-
-			p = matrixMultiplication(T, p);
-
-			row.setFloat("x", p[0]);
-			row.setFloat("y", p[1]);
-		}
-
-		if (checkOverflow) checkOverflow("translate");
+		transform(T, 0,0,checkOverflow);
 	}
 
 	void rotate(boolean checkOverflow) {
@@ -170,21 +152,10 @@ public class Main extends PApplet {
 		T[1][0] = sin(radians(rotateAngle));
 		T[1][1] = cos(radians(rotateAngle));
 
-		for (TableRow row : table.rows()) {
-			pInit = new float[]{0, 0, 1};
-			float[] p = pInit;
-			p[0] = row.getFloat("x") - originX;
-			p[1] = row.getFloat("y") - originY;
-			p = matrixMultiplication(T, p);
-
-			row.setFloat("x", p[0] + originX);
-			row.setFloat("y", p[1] + originY);
-		}
-
-		if (checkOverflow) checkOverflow("translate");
+		transform(T, originX, originY, checkOverflow);
 	}
 
-	void scale() {
+	void scale(boolean checkOverflow) {
 		countClicks++;
 
 		if (countClicks % 2 == 0) {
@@ -192,19 +163,19 @@ public class Main extends PApplet {
 			transformY = mouseY - transformY;
 			countClicks = 0;
 
-			for (TableRow row : table.rows()) {
-				float x = row.getFloat("x");
-				float y = row.getFloat("y");
-				x *= transformX;
-				y *= transformY;
-
-				row.setFloat("x", row.getFloat("x") * transformX);
-				row.setFloat("y", row.getFloat("y") * transformY);
-			}
+			scale((float) (transformX * 1), (float) (transformY * 1), checkOverflow);
 		} else {
 			transformX = mouseX;
 			transformY = mouseY;
 		}
+	}
+
+	void scale(float transformX, float transformY, boolean checkOverflow) {
+		float[][] T = new Tinit().matrix;
+		T[0][0] = transformX;
+		T[1][1] = transformY;
+
+		transform(T, originX, originY, true);
 	}
 
 	public void scale(float scale) {
@@ -240,7 +211,8 @@ public class Main extends PApplet {
 				break;
 			}
 			case "scale": {
-
+				if (deltaX != 0 || deltaY != 0) translate(deltaX, deltaY, false);
+				break;
 			}
 		}
 	}
@@ -254,7 +226,7 @@ public class Main extends PApplet {
 				rotate(true);
 			}
 			if (scale) {
-				scale();
+				scale(true);
 			}
 		} else {
 			TableRow newRow = table.addRow();
