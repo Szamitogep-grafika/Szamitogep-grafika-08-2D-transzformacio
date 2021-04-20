@@ -107,7 +107,7 @@ public class Main extends PApplet {
 		return transformed;
 	}
 
-	void transform(float[][] T, float originX, float originY, boolean checkOverflow) {
+	void transform(float[][] T, float originX, float originY, boolean checkOverflow, String method) {
 		for (TableRow row : table.rows()) {
 			float[] p = {0, 0, 1};
 			p[0] = row.getFloat("x") - originX;
@@ -119,7 +119,7 @@ public class Main extends PApplet {
 			row.setFloat("y", p[1] + originY);
 		}
 
-		if (checkOverflow) checkOverflow("translate");
+		if (checkOverflow) checkOverflow(method);
 	}
 
 	void translate(boolean checkOverflow) {
@@ -142,7 +142,7 @@ public class Main extends PApplet {
 		T[0][2] = transformX;
 		T[1][2] = transformY;
 
-		transform(T, 0,0,checkOverflow);
+		transform(T, 0,0,checkOverflow, "translate");
 	}
 
 	void rotate(boolean checkOverflow) {
@@ -152,7 +152,7 @@ public class Main extends PApplet {
 		T[1][0] = sin(radians(rotateAngle));
 		T[1][1] = cos(radians(rotateAngle));
 
-		transform(T, originX, originY, checkOverflow);
+		transform(T, originX, originY, checkOverflow, "translate");
 	}
 
 	void scale(boolean checkOverflow) {
@@ -175,7 +175,7 @@ public class Main extends PApplet {
 		T[0][0] = transformX;
 		T[1][1] = transformY;
 
-		transform(T, originX, originY, true);
+		transform(T, originX, originY, checkOverflow, "scale");
 	}
 
 	public void scale(float scale) {
@@ -199,14 +199,13 @@ public class Main extends PApplet {
 			if (x > maxX) maxX = x;
 			if (y > maxY) maxY = y;
 		}
-
-		if (originX - minX > 0) deltaX = originX - minX;
-		if (width - maxX < 0) deltaX = width - maxX;
-		if (originY - minY > 0) deltaY = originY - minY;
-		if (height - maxY < 0) deltaY = height - maxY;
-
 		switch (method) {
 			case "translate": {
+				if (originX - minX > 0) deltaX = originX - minX;
+				if (width - maxX < 0) deltaX = width - maxX;
+				if (originY - minY > 0) deltaY = originY - minY;
+				if (height - maxY < 0) deltaY = height - maxY;
+
 				if (deltaX != 0 || deltaY != 0) translate(deltaX, deltaY, false);
 				break;
 			}
