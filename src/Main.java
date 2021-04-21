@@ -4,12 +4,8 @@ import processing.data.TableRow;
 import processing.event.MouseEvent;
 
 public class Main extends PApplet {
-	final int width = 640;
-	final int height = 480;
-	final int originX = width / 2;  // TESTING
-	final int originY = height / 2; // TESTING
-	//final int originX = 0;
-	//final int originY = 0;
+	int originX;  // TESTING
+	int originY; // TESTING
 
 	Table table;
 	boolean translate = false;
@@ -50,7 +46,9 @@ public class Main extends PApplet {
 	}
 
 	public void setup() {
-		size(width, height);
+		size(640, 480);
+		originX = width / 2;  // TESTING
+		originY = height / 2; // TESTING
 
 		table = new Table();
 		table.addColumn("x");
