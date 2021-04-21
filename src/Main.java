@@ -14,8 +14,10 @@ public class Main extends PApplet {
 
 	final int width = 640;
 	final int height = 480;
-	final float originX = width / 3;
-	final float originY = height / 3;
+	//final float originX = width / 2;
+	//final float originY = height / 2;
+	final float originX = 0;
+	final float originY = 0;
 
 	final float[][] tInit = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
 	float[] pInit = new float[]{0, 0, 1};
@@ -39,7 +41,7 @@ public class Main extends PApplet {
 		newRow.setFloat("y", 245);
 
 		newRow = table.addRow();
-		newRow.setFloat("x", 340);
+		newRow.setFloat("x", 325);
 		newRow.setFloat("y", 340);
 	}
 
@@ -119,7 +121,9 @@ public class Main extends PApplet {
 			row.setFloat("y", p[1] + originY);
 		}
 
-		if (checkOverflow) checkOverflow(method);
+		if (checkOverflow)
+			//if ((method == "scale" && T[0][0] > 1 && T[1][1] > 1) || method == "translate")
+				checkOverflow(method);
 	}
 
 	void translate(boolean checkOverflow) {
@@ -142,7 +146,7 @@ public class Main extends PApplet {
 		T[0][2] = transformX;
 		T[1][2] = transformY;
 
-		transform(T, 0,0,checkOverflow, "translate");
+		transform(T, 0, 0, checkOverflow, "translate");
 	}
 
 	void rotate(boolean checkOverflow) {
@@ -153,6 +157,9 @@ public class Main extends PApplet {
 		T[1][1] = cos(radians(rotateAngle));
 
 		transform(T, originX, originY, checkOverflow, "translate");
+
+		T = new Tinit().matrix;
+		transform(T, originX, originY, checkOverflow, "scale");
 	}
 
 	void scale(boolean checkOverflow) {
@@ -186,21 +193,23 @@ public class Main extends PApplet {
 	}
 
 	public void checkOverflow(String method) {
-		float minX = originX, minY = originY, maxX = width, maxY = height;
 		float deltaX = 0, deltaY = 0;
 		float x, y;
 
-		for (TableRow row : table.rows()) {
-			x = row.getFloat("x");
-			y = row.getFloat("y");
-
-			if (x < minX) minX = x;
-			if (y < minY) minY = y;
-			if (x > maxX) maxX = x;
-			if (y > maxY) maxY = y;
-		}
 		switch (method) {
 			case "translate": {
+				float minX = originX, minY = originY, maxX = width, maxY = height;
+
+				for (TableRow row : table.rows()) {
+					x = row.getFloat("x");
+					y = row.getFloat("y");
+
+					if (x < minX) minX = x;
+					if (y < minY) minY = y;
+					if (x > maxX) maxX = x;
+					if (y > maxY) maxY = y;
+				}
+
 				if (originX - minX > 0) deltaX = originX - minX;
 				if (width - maxX < 0) deltaX = width - maxX;
 				if (originY - minY > 0) deltaY = originY - minY;
@@ -210,7 +219,31 @@ public class Main extends PApplet {
 				break;
 			}
 			case "scale": {
-				if (deltaX != 0 || deltaY != 0) translate(deltaX, deltaY, false);
+				TableRow row0 = table.getRow(0);
+				float minX = row0.getFloat("x"), minY = row0.getFloat("y"), maxX = row0.getFloat("x"), maxY = row0.getFloat("y");
+
+				for (TableRow row : table.rows()) {
+					x = row.getFloat("x");
+					y = row.getFloat("y");
+
+					if (x < minX) minX = x;
+					if (y < minY) minY = y;
+					if (x > maxX) maxX = x;
+					if (y > maxY) maxY = y;
+				}
+
+				deltaX = 1;
+				deltaY = 1;
+
+				if (minX < originX || maxX > originX) {
+					deltaX = abs(width / (width + maxX - minX));
+				}
+				if (minY < originY || maxY > originY) {
+					deltaY = abs(height / (height + maxY - minY));
+				}
+
+				scale(deltaX, deltaY, false);
+				checkOverflow("translate");
 				break;
 			}
 		}
@@ -258,14 +291,15 @@ public class Main extends PApplet {
 			}
 	}
 
-	public void mouseWheel(MouseEvent event) {
-		float e = event.getCount();
-		if (e < 0)
-			scale((float) 1.1);
-		else
-			scale((float) (1.0 / 1.1));
-	}
-
+	/*
+		public void mouseWheel(MouseEvent event) {
+			float e = event.getCount();
+			if (e < 0)
+				scale((float) 1.1);
+			else
+				scale((float) (1.0 / 1.1));
+		}
+	*/
 	public void settings() {
 		setup();
 	}
